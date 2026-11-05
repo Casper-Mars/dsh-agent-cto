@@ -1,0 +1,39 @@
+# dsh-agent-cto bundle patch —— 单一角色：CTO（技术决策者 + 架构师）
+#
+# 结构：一次 insert 完成三层装配 —— 本包领域插件（cto-domain）、preset 注册表默认值、
+# 以及唯一的 agent preset（preset-cto）。id / name / inject 必须与 src/plugin.ts 逐项一致。
+#
+# 本轮（任务-01）只保证「结构正确」；preset 工具面与断言细节由任务-04 补齐。
+# 硬约束：一个 profile 只装一个角色包（两个角色包都占用 registry.default 与人设槽位）。
+
+- insert:
+    - id: cto-domain
+      name: dsh-agent-cto
+      inject: ['skills', 'agents']
+
+    - id: agent-preset-registry
+      name: '@deepseek-ai/dsh-agent-preset-registry'
+      config:
+        # 主会话 + 驿传 ensureSession 的默认 preset 都取这里
+        default: cto
+
+    - id: preset-cto
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: cto
+        name: CTO
+        description: 技术决策者：技术选型、架构设计、开发任务拆解。
+        order: 10
+        plugins:
+          - id: tool-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+          - id: tool-bash
+            name: '@deepseek-ai/dsh-tool-bash'
+          - id: tool-skill
+            name: '@deepseek-ai/dsh-tool-skill'
+          - id: tool-todo
+            name: '@deepseek-ai/dsh-tool-todo'
+            config:
+              allowParallelInProgress: false
+          - id: tool-web
+            name: '@deepseek-ai/dsh-tool-web'
