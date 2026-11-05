@@ -1,13 +1,15 @@
 /**
  * `cto` 领域数据（`src/domain.ts` + `src/persona.ts`）的声明契约。
  *
- * 基线：`dsh-agent-dev@bc78f02` 的 `tests/domain.spec.ts`。断言五件事：
+ * 基线：`dsh-agent-dev@bc78f02` 的 `tests/domain.spec.ts`。断言六件事：
  *   1. 声明的 Skill 集合与 `skills/` 目录精确相等（不多不少），顺序即三顶帽子；
  *   2. 每个 SKILL.md 的 frontmatter 三字段非空，name 等于目录名，description
  *      与领域声明逐字一致；
- *   3. 随包 `references/` / `assets/` 的每个 .md 存在且非空；
- *   4. 人设与 `CTO_DOMAIN.personaMarkdown` 同源，且不超过 90 行；
- *   5. 人设里三顶帽子的顺序固定。
+ *   3. 随包 `references/` / `assets/` 的每个文件存在且非空；
+ *   4. 每个随包文件都在对应 SKILL.md 正文被点名，且正文点名的路径都真实存在
+ *      （双向指针校验，防止「文件躺着没人路由」与「路由指向不存在的文件」）；
+ *   5. 三个技能的 description / whenToUse 路由互斥，不得出现其它技能名（§10 L4′）；
+ *   6. 人设与 `CTO_DOMAIN.personaMarkdown` 同源，且不超过 90 行。
  */
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import path from 'node:path'
@@ -51,6 +53,30 @@ function markdownFiles(dir: string): string[] {
     else if (entry.isFile() && entry.name.endsWith('.md')) results.push(entry.name)
   }
   return results.sort()
+}
+
+/** 递归列出目录下的全部文件（相对目录，不限扩展名；用于 `assets/`）。 */
+function assetFiles(dir: string): string[] {
+  if (!existsSync(dir)) return []
+  const results: string[] = []
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isDirectory()) results.push(...assetFiles(path.join(dir, entry.name)).map((rel) => path.join(entry.name, rel)))
+    else if (entry.isFile()) results.push(entry.name)
+  }
+  return results.sort()
+}
+
+const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/** 正文是否以完整相对路径点名某文件。 */
+function mentions(content: string, relative: string): boolean {
+  return new RegExp(`(^|[^\\w./-])${escapeRegExp(relative)}(?![\\w./-])`).test(content)
+}
+
+/** 正文中出现的 `references/…md` / `assets/…md` 相对路径（去重）。 */
+function referencedPaths(content: string): string[] {
+  const pattern = /(?:^|[^\w./-])((?:references|assets)\/[\w.\-/]+\.md)(?![\w./-])/g
+  return [...new Set([...content.matchAll(pattern)].map((match) => match[1] as string))].sort()
 }
 
 describe('CTO_DOMAIN 声明', () => {
@@ -111,6 +137,54 @@ describe.each(EXPECTED_SKILL_NAMES)('Skill %s 随包资产', (name) => {
     expect(files.length).toBeGreaterThan(0)
     for (const file of files) {
       expect(statSync(path.join(dir, file)).size, `${name}/${subdir}/${file} 为空`).toBeGreaterThan(0)
+    }
+  })
+})
+
+describe.each(EXPECTED_SKILL_NAMES)('Skill %s 正文与随包文件互链', (name) => {
+  const skillDir = path.join(SKILLS_ROOT, name)
+
+  it('每个 references/*.md 都在 SKILL.md 正文被点名', () => {
+    const { content } = readSkillFrontmatter(name)
+    const files = markdownFiles(path.join(skillDir, 'references'))
+    expect(files.length).toBeGreaterThan(0)
+    for (const file of files) {
+      const relative = path.join('references', file)
+      expect(mentions(content, relative), `${name}/SKILL.md 未点名 ${relative}`).toBe(true)
+    }
+  })
+
+  it('每个 assets/* 都在 SKILL.md 正文被点名', () => {
+    const { content } = readSkillFrontmatter(name)
+    const files = assetFiles(path.join(skillDir, 'assets'))
+    expect(files.length).toBeGreaterThan(0)
+    for (const file of files) {
+      const relative = path.join('assets', file)
+      expect(mentions(content, relative), `${name}/SKILL.md 未点名 ${relative}`).toBe(true)
+    }
+  })
+
+  it('正文点名的 references/assets 都真实存在（无悬空指针）', () => {
+    const { content } = readSkillFrontmatter(name)
+    const referenced = referencedPaths(content)
+    expect(referenced.length, `${name}/SKILL.md 未点名任何随包文件`).toBeGreaterThan(0)
+    for (const relative of referenced) {
+      const target = path.join(skillDir, ...relative.split('/'))
+      expect(existsSync(target), `${name}/SKILL.md 指向不存在的 ${relative}`).toBe(true)
+      expect(statSync(target).isFile(), `${relative} 不是普通文件`).toBe(true)
+    }
+  })
+})
+
+describe('CTO 技能路由互斥（§10 L4′）', () => {
+  it.each(EXPECTED_SKILL_NAMES)('%s 的 description / whenToUse 不含其它技能名', (name) => {
+    const parsed = readSkillFrontmatter(name)
+    const text = `${parsed.description}\n${parsed.whenToUse}`
+    const others = EXPECTED_SKILL_NAMES.filter((other) => other !== name)
+
+    expect(others).toHaveLength(EXPECTED_SKILL_NAMES.length - 1)
+    for (const other of others) {
+      expect(text, `${name} 的描述里出现了其它技能名 ${other}（路由会串线）`).not.toContain(other)
     }
   })
 })
