@@ -1,8 +1,8 @@
 {
   "name": "dsh-agent-cto",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
-  "description": "技术决策者：技术选型、架构设计、开发任务拆解",
+  "description": "技术决策者：决策、设计、评审、治理与任务拆解",
   "keywords": [
     "dsh",
     "dsh-plugin",

@@ -10,7 +10,7 @@ Skill + agent preset」，不是业务应用。
 - **原生单包**：不依赖任何外部 agent core 包；`dsh plugin add` 装本包即可。
 - **零工具**：本包不声明任何 tools 实现（无 `tools()`，也无 `toolNames` 字段）；能力由
   `cordis.patch.yml` 的 preset 组合 dsh 内置插件提供。
-- **零状态**：不写盘、不建资产目录、没有 bootstrap；3 个 Skill 只从包内 `skills/` 读取并注册。
+- **零状态**：不写盘、不建资产目录、没有 bootstrap；10 个 Skill 只从包内 `skills/` 读取并注册。
 - **只读 Skill**：Skill 正文不会被运行时改写。
 - **人设唯一来源**：`src/persona.ts` 的 `CTO_PERSONA`，由插件注入 **depth 0 根会话**；
   `preset-cto` 不挂 persona。
@@ -18,8 +18,8 @@ Skill + agent preset」，不是业务应用。
 
 ## 2. 角色边界
 
-- 本包只承载 **CTO（技术决策者 + 架构师）** 一个角色，三顶帽子顺序固定、不许跳步：
-  决策（`cto-adr`）→ 设计（`architect-tech-spec`）→ 拆任务（`dev-task-plan`）。
+- 本包只承载 **CTO（技术决策者 + 架构师）** 一个角色，五类职责顺序固定、不许跳步：
+  决策 → 设计 → 评审 → 治理 → 拆任务。
 - 不下场编码、不改业务代码；编码与验收由开发 Agent 执行。
 - 方案不写排期与人日；任务计划不写文件名、函数名、提交顺序。
 
@@ -40,12 +40,12 @@ Skill + agent preset」，不是业务应用。
 1. **一个 profile 只装一个角色包**（pm / cto 双装会互相覆盖 default preset 与人设槽位）。
 2. `src/plugin.ts` / `src/firmware.ts` 与 `dsh-agent-dev`、`dsh-agent-pm` 同源：改一处必须三仓同改并各自跑测试。
 3. 角色包不做子 agent 编排，不挂 `tool-subagent`；跨角色协作走驿传派单。
-4. 三个技能的 `description` / `whenToUse` 必须互斥，不得出现其它两个技能名（防路由串线，
+4. 十个技能的 `description` / `whenToUse` 必须互斥，不得出现其它技能名（防路由串线，
    §10 L4′，`tests/domain.spec.ts` 机械校验）。
 5. **Skill 资产双向可追溯**：`references/` 与 `assets/` 下每个文件都必须在对应 `SKILL.md` 正文被点名；
    正文点名的路径也必须真实存在（`tests/domain.spec.ts` 断言）。
 6. **自检清单与计数同步**：`scripts/verify-install.mjs` 的 `EXPECTED_SKILLS` / `EXPECTED_ASSETS` /
-   `EXPECTED_REFERENCES` 是唯一真源，当前 15 项（3 SKILL + 4 assets + 8 references）；增删文件必须同步
+   `EXPECTED_REFERENCES` 是唯一真源，当前 37 项（10 SKILL + 11 assets + 16 references）；增删文件必须同步
    `tests/verify-install.spec.ts` 的计数断言与 README。
 7. frontmatter 只有 `name` / `description` / `whenToUse` 三个字段，单行扁平标量，`name` 必须等于目录名。
 8. 不在本仓库改 `dsh-agent-dev` / `dsh-domain` / `dsh-agent-pm`；不执行 `npm publish` / `pnpm publish`。
@@ -57,9 +57,9 @@ Skill + agent preset」，不是业务应用。
 | 命令 | 作用 | 成功判据 |
 |------|------|----------|
 | `pnpm typecheck` | `tsc --noEmit` | 退出码 0 |
-| `pnpm test` | `vitest run`（5 个 spec） | 85 passed、0 failed、0 skipped |
+| `pnpm test` | `vitest run`（5 个 spec） | 141 passed、0 failed、0 skipped |
 | `pnpm build` | 清理 → 类型检查 → 编译 → 复制 patch | `dist-server/index.js` 与 `dist-server/cordis.patch.yml` 存在 |
-| `pnpm verify:install` | 包内 15 项资产自检 | 15 行 PASS、退出码 0 |
+| `pnpm verify:install` | 包内 37 项资产自检 | 37 行 PASS、退出码 0 |
 | `make check` | build → test → verify → pack | 全绿 |
 
 `verify:install` 默认检查包内 `skills/`，未安装也能全 PASS；`--assets <dir>` 只用于手工核查其它目录。

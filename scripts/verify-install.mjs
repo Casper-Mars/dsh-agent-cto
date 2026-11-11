@@ -6,8 +6,8 @@
  * 旧版的「安装目录」硬编码与 `--home` / 环境变量默认推导已随任务-05 删除；
  * `--assets <dir>` 只用于手工核查其它资产目录，不再是默认路径。
  *
- * 检查清单是本文件的唯一真源：`EXPECTED_SKILLS`（3 个）+ `EXPECTED_ASSETS`（4 个）
- * + `EXPECTED_REFERENCES`（8 个）= 15 项，与包内三个 Skill 的实际布局逐项对应。
+ * 检查清单是本文件的唯一真源：`EXPECTED_SKILLS`（10 个）+ `EXPECTED_ASSETS`（11 个）
+ * + `EXPECTED_REFERENCES`（16 个）= 37 项，与包内三个 Skill 的实际布局逐项对应。
  * 新增 / 删除随包文件时必须同步本清单与 `tests/verify-install.spec.ts` 的计数断言。
  *
  * 退出码：全 PASS 为 0，有 FAIL 为 1，参数 / 环境错误（目录不存在、未知参数）为 2。
@@ -20,7 +20,18 @@ import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 
 /** 期望的领域 Skill（与 `src/domain.ts` 的 `CTO_DOMAIN.skills` 一致）。 */
-export const EXPECTED_SKILLS = ['cto-adr', 'architect-tech-spec', 'dev-task-plan']
+export const EXPECTED_SKILLS = [
+  'cto-adr',
+  'architect-tech-spec',
+  'cto-arch-review',
+  'cto-code-review',
+  'cto-tech-debt',
+  'cto-security-review',
+  'cto-incident-review',
+  'cto-standards',
+  'cto-harness-audit',
+  'dev-task-plan',
+]
 
 /**
  * 除 `SKILL.md` 外必须存在且非空的随包文件。
@@ -33,10 +44,17 @@ export const EXPECTED_ASSETS = [
   { skill: 'cto-adr', file: 'assets/adr-template.md' },
   { skill: 'cto-adr', file: 'assets/roadmap-template.md' },
   { skill: 'architect-tech-spec', file: 'assets/doc-template.md' },
+  { skill: 'cto-arch-review', file: 'assets/review-report.md' },
+  { skill: 'cto-code-review', file: 'assets/pr-review.md' },
+  { skill: 'cto-tech-debt', file: 'assets/debt-register.md' },
+  { skill: 'cto-security-review', file: 'assets/threat-model.md' },
+  { skill: 'cto-incident-review', file: 'assets/postmortem.md' },
+  { skill: 'cto-standards', file: 'assets/rfc-template.md' },
+  { skill: 'cto-harness-audit', file: 'assets/harness-report.md' },
   { skill: 'dev-task-plan', file: 'assets/task-plan-template.md' },
 ]
 
-/** `references/` 下的随包文件（8 个）。 */
+/** `references/` 下的随包文件（16 个）。 */
 export const EXPECTED_REFERENCES = [
   { skill: 'cto-adr', file: 'references/checklists.md' },
   { skill: 'cto-adr', file: 'references/decision-catalog.md' },
@@ -45,10 +63,17 @@ export const EXPECTED_REFERENCES = [
   { skill: 'architect-tech-spec', file: 'references/checklists.md' },
   { skill: 'architect-tech-spec', file: 'references/data-and-api.md' },
   { skill: 'architect-tech-spec', file: 'references/example.md' },
+  { skill: 'cto-arch-review', file: 'references/review-checklist.md' },
+  { skill: 'cto-arch-review', file: 'references/failure-modes.md' },
+  { skill: 'cto-code-review', file: 'references/review-dimensions.md' },
+  { skill: 'cto-tech-debt', file: 'references/debt-taxonomy.md' },
+  { skill: 'cto-security-review', file: 'references/security-checklist.md' },
+  { skill: 'cto-incident-review', file: 'references/rca.md' },
+  { skill: 'cto-standards', file: 'references/standard-writing.md' },
+  { skill: 'cto-harness-audit', file: 'references/harness-domains.md' },
   { skill: 'dev-task-plan', file: 'references/checklists.md' },
 ]
 
-/** 全部随包文件 = assets + references（派生导出，勿另写一份）。 */
 export const EXPECTED_FILES = [...EXPECTED_ASSETS, ...EXPECTED_REFERENCES]
 
 /** 检查项总数：SKILL.md 数 + 随包文件数。 */

@@ -24,7 +24,18 @@ const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url))
 const SKILLS_ROOT = path.join(REPO_ROOT, 'skills')
 
 /** 期望的 Skill（顺序 = 决策 → 设计 → 拆任务）。 */
-const EXPECTED_SKILL_NAMES = ['cto-adr', 'architect-tech-spec', 'dev-task-plan']
+const EXPECTED_SKILL_NAMES = [
+  'cto-adr',
+  'architect-tech-spec',
+  'cto-arch-review',
+  'cto-code-review',
+  'cto-tech-debt',
+  'cto-security-review',
+  'cto-incident-review',
+  'cto-standards',
+  'cto-harness-audit',
+  'dev-task-plan',
+]
 
 /** 人设行数硬上限（方案 §8）。 */
 const PERSONA_MAX_LINES = 90
