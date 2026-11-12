@@ -16,7 +16,7 @@
 
 ## 安装
 
-前置：dsh `0.2.1-rc.2`、Node ≥ `22.19.0`、pnpm ≥ `11.7.0`。
+前置：dsh `>=0.2.1-rc.2 <0.3.0`、Node ≥ `22.19.0`、pnpm ≥ `11.7.0`。
 
 ```bash
 # 在仓库根目录：安装依赖并编译（产出 dist-server/）
@@ -150,3 +150,16 @@ node scripts/verify-install.mjs --assets /path/to/skills
 
 > 验收记录占位：L3 / L3' / L4 / L4' 的实测证据（命令、输出、结论、残余风险）由验收阶段填写。
 > 本仓库不预填验收结果；未实测的内容不得写入本节。
+
+## 版本兼容性
+
+**声明位置**：`package.json` → `engines.dsh`（本版本为 `>=0.2.1-rc.2 <0.3.0`）。dsh 在安装插件时读它，
+不满足直接拒绝安装并打印不满足项——升级 dsh 后装不上，先看这个字段。
+
+每次合并 main / 每天 09:00 由 `.github/workflows/dsh-compat.yml` 做三层校验（安装准入 → patch 组合 →
+冷启动探针），不兼容时自动开 issue（label `dsh-compat`），恢复后自动关闭。本地跑同一条路径：
+
+```bash
+pnpm compat                 # 校验 npm latest
+pnpm compat 0.2.2-rc.2      # 校验指定版本
+```
