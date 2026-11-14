@@ -240,6 +240,7 @@ export function registerDomainFirmwareSkills(
   ctx: Context,
   skills: readonly FirmwareSkill[] | undefined = CTO_DOMAIN.skills,
   logger: DomainLogger = createDomainLogger(readService(ctx, 'logger'), 'cto-domain'),
+  options: { readonly verifyWinner?: boolean } = {},
 ): Array<() => void> {
   const registry = readSkillRegistry(ctx)
   if (registry === undefined) {
@@ -268,7 +269,9 @@ export function registerDomainFirmwareSkills(
       unregisters.push(unregister)
       registered.push(registration.name)
       claimed.add(registration.name)
-      verifyRegistrationWinner(registry, registration, logger)
+      // 核验用的是宿主层读取：注册发生在 preset scope 时会永远读不到，
+      // 调用方因此可以关掉它（否则每次会话启动刷十条假告警）。
+      if (options.verifyWinner ?? true) verifyRegistrationWinner(registry, registration, logger)
     }
   } catch (error) {
     const rolledBack: string[] = []
@@ -396,25 +399,29 @@ interface AgentPresetsLike {
 /**
  * 读 agent 当前挂载的 preset id。
  *
- * 两个来源：会话 header 里的持久化记录（创建时写入，最先可用），
- * 其次是 `agentPresets.composedPreset()`（运行时的绑定）。两者都拿不到时
- * 返回 `undefined`——此时按「无法判定」处理，保留旧的注入行为，
- * 避免在没装 preset 服务的宿主上把人设静默丢掉。
+ * 两个来源：优先 `agentPresets.composedPreset()`（运行时绑定，晚选 preset 也准），
+ * 回退到会话 header 的持久化记录。两者都拿不到时返回 `undefined`——此时按
+ * 「无法判定」处理，保留旧的注入行为，避免在没装 preset 服务的宿主上把人设静默丢掉。
  */
 function composedPresetOf(agent: AgentLike): string | undefined {
+  // 优先读运行时绑定：晚选的 preset（select 在首个 turn 前允许）会改这里，
+  // 而 header 仍是创建时的值。
+  const service = peekService(agent.ctx, 'agentPresets')
+  if (service !== null && typeof service === 'object') {
+    const composedPreset = (service as AgentPresetsLike).composedPreset
+    if (typeof composedPreset === 'function') {
+      try {
+        const value = composedPreset.call(service, agent.ctx)
+        if (typeof value === 'string' && value.length > 0) return value
+      } catch {
+        // 落到 header
+      }
+    }
+  }
+
   const persisted = agent.session?.header?.agentPreset
   if (typeof persisted === 'string' && persisted.length > 0) return persisted
-
-  const service = peekService(agent.ctx, 'agentPresets')
-  if (service === null || typeof service !== 'object') return undefined
-  const composedPreset = (service as AgentPresetsLike).composedPreset
-  if (typeof composedPreset !== 'function') return undefined
-  try {
-    const value = composedPreset.call(service, agent.ctx)
-    return typeof value === 'string' && value.length > 0 ? value : undefined
-  } catch {
-    return undefined
-  }
+  return undefined
 }
 
 interface PersonaEntry {

@@ -31,7 +31,11 @@ export function apply(ctx: Context): void {
   const logger = createDomainLogger(readService(ctx, 'logger'), 'cto-assets')
 
   ctx.effect(() => {
-    const unregisters = registerDomainFirmwareSkills(ctx, CTO_DOMAIN.skills, logger)
+    const unregisters = registerDomainFirmwareSkills(ctx, CTO_DOMAIN.skills, logger, {
+      // 这里的 ctx 是 agent 的 preset scope：宿主层读不到这些 Skill，
+      // 「注册后是否可见」的核验只会产生假告警，关掉。
+      verifyWinner: false,
+    })
 
     return () => {
       for (let index = unregisters.length - 1; index >= 0; index -= 1) {
