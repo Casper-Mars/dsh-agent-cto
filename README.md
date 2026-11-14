@@ -6,7 +6,7 @@
 
 - **CTO persona**：注入主会话（depth 0 根 agent）的常驻 system prompt；
 - **10 个只读领域 Skill**：决策、设计、评审、治理、拆任务五类职责，随包发布在
-  `skills/`，运行时由插件注册进 `ctx.skills`；
+  `skills/`，由 **preset 层**的 `dsh-agent-cto/assets` 注册进该 preset 的 scope；
 - **1 个 agent preset**：`cto`，由 `cordis.patch.yml` 装配。
 
 五类职责顺序固定、不许跳步：决策 → 设计 → 评审 → 治理 → 拆任务。不下场编码、不改业务代码；
@@ -33,11 +33,11 @@ dsh plugin --profile <p> add link:$PWD
 ### 装完核对组合树
 
 ```bash
-dsh --profile <p> --dump-config | grep -E "cto-domain|preset-cto"
+dsh --profile <p> --dump-config | grep -E "cto-domain|cto-assets|preset-cto"
 ```
 
-应能看到 `cto-domain`（`inject: ['skills', 'agents']`）、`agent-preset-registry.default: cto`，
-以及唯一的 preset `cto`。
+应能看到 `cto-domain`（宿主层，`inject: ['agents']`）、preset `cto` 的首项
+`cto-assets`（`dsh-agent-cto/assets`）、`agent-preset-registry.default: cto`。
 
 ## 技能
 
@@ -102,7 +102,8 @@ node scripts/verify-install.mjs --assets /path/to/skills
 ├─ vitest.config.ts
 ├─ src/
 │  ├─ index.ts                   # 包入口：re-export 插件三要素与领域数据
-│  ├─ plugin.ts                  # Cordis 插件：注入 ['skills','agents']；注册 10 个 Skill；depth 0 注入 persona
+│  ├─ plugin.ts                  # 宿主层插件：inject ['agents']；depth 0 且 preset=cto 时注入 persona
+│  ├─ assets.ts                  # preset 层插件：注入进 preset 后注册 10 个 Skill
 │  ├─ domain.ts                  # CTO_DOMAIN：id / version / displayName / persona / 10 个 Skill 元数据
 │  ├─ persona.ts                 # CTO_PERSONA：CTO 的全部行为规则（人设唯一来源，≤ 90 行）
 │  └─ firmware.ts                # SKILL.md 读取 / frontmatter 解析 / SkillRegistration 构造
@@ -130,16 +131,18 @@ node scripts/verify-install.mjs --assets /path/to/skills
 
 ### 运行时装配
 
-1. `cordis.patch.yml` 插入 `cto-domain` 插件、`agent-preset-registry`（default=`cto`）与 preset `cto`；
-2. 插件 `apply()` 从 `ctx.skills` 注册 10 个 Skill（正文读 `skills/<name>/SKILL.md`），注册中途失败
-   原子回滚，卸载按 LIFO 反注册；
-3. 插件监听 `agent/created`，只给 **depth 0** 根 agent 注入 `CTO_PERSONA`；子 agent 使用各自
-   preset 的 persona。
+1. `cordis.patch.yml` 插入 `cto-domain`（宿主层）、`agent-preset-registry`（default=`cto`）与 preset `cto`；
+2. preset 首项挂 `dsh-agent-cto/assets`：它在每个 agent 的 scope 里注册 10 个 Skill（正文读
+   `skills/<name>/SKILL.md`），注册中途失败原子回滚，卸载按 LIFO 反注册；
+   Skill 因此落在 **preset 层**，单 host 装多个角色包时不会并成一份；
+3. `cto-domain` 监听 `agent/created`，只给 **depth 0 且 preset 为 `cto`** 的根 agent 注入
+   `CTO_PERSONA`；其他 preset 的会话不会被压上 CTO 人设。
 
 ## 硬约束
 
-- **一个 profile 只装一个角色包**：`dsh-agent-cto` 与 `dsh-agent-pm` 都占用
-  `agent-preset-registry.default` 与同一个 `deployment:persona-prefix` 槽位，双装必然互相覆盖。
+- **`registry.default` 只有一个写者**：合并进同一 profile 时，只有本包插入
+  `agent-preset-registry` 并写 `default: cto`；其余角色包不重复插入注册表（即不 claim default）。
+  persona 已按 preset id 门控，不再互相覆盖。
 - `src/plugin.ts` / `src/firmware.ts` 与 `dsh-agent-dev`、`dsh-agent-pm` 同源：改注入器或加载器
   必须三仓同改并各自跑测试。
 - 角色包不做子 agent 编排，不挂 `tool-subagent`；跨角色协作走驿传派单。

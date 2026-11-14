@@ -1,6 +1,6 @@
 {
   "name": "dsh-agent-cto",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "type": "module",
   "description": "技术决策者：决策、设计、评审、治理与任务拆解",
   "keywords": [
@@ -24,6 +24,10 @@
     ".": {
       "types": "./dist-server/types/index.d.ts",
       "default": "./dist-server/index.js"
+    },
+    "./assets": {
+      "types": "./dist-server/types/assets.d.ts",
+      "default": "./dist-server/assets.js"
     },
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
