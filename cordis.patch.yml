@@ -1,7 +1,7 @@
 # dsh-agent-cto bundle patch —— 单一角色：CTO（技术决策者 + 架构师）
 #
-# 结构：一次 insert 完成三层装配 —— 本包宿主层插件（cto-domain）、preset 注册表默认值、
-# 以及唯一的 agent preset（preset-cto）。id / name / inject 必须与 src/plugin.ts 逐项一致。
+# 结构：一次 insert 完成两层装配 —— preset 注册表默认值与唯一的 agent preset（preset-cto）。
+# persona 与领域 Skill 都由 preset 的 `cto-assets` 在 agent scope 注册（不再有宿主层插件）。
 #
 # 角色资产（领域 Skill）不在宿主层：preset 的 plugins 首项挂 `dsh-agent-cto/assets`，
 # 注册进该 preset 的 scope 层，单 host 装多个角色包时技能不会并成一份。
@@ -11,10 +11,6 @@
 # 硬约束：`registry.default` 只能由一个角色包写（本包持有）；其他角色包合并时关闭。
 
 - insert:
-    - id: cto-domain
-      name: dsh-agent-cto
-      inject: ['agents']
-
     - id: agent-preset-registry
       name: '@deepseek-ai/dsh-agent-preset-registry'
       config:
