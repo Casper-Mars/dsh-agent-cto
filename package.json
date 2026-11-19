@@ -59,7 +59,8 @@
     "clean": "rm -rf dist dist-server",
     "prepublishOnly": "pnpm build",
     "compat": "bash scripts/dsh-compat.sh",
-    "design:validate": "node design-kit/scripts/validate-tokens.mjs"
+    "design:validate": "node design-kit/scripts/validate-tokens.mjs",
+    "design:css": "node design-kit/scripts/tokens-to-css.mjs"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4.0.5 <5.0.0",
