@@ -67,7 +67,9 @@
     "design:css": "node design-kit/scripts/tokens-to-css.mjs",
     "design:template": "node design-kit/scripts/build-template-tokens.mjs",
     "design:shots": "node design-kit/scripts/screenshot.mjs",
-    "design:check": "node design-kit/scripts/check.mjs"
+    "design:check": "node design-kit/scripts/check.mjs",
+    "design:sync": "node design-kit/scripts/sync-to-one.mjs",
+    "design:drift": "node design-kit/scripts/check-drift.mjs"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4.0.5 <5.0.0",

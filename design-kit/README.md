@@ -88,4 +88,11 @@ node design-kit/scripts/validate-tokens.mjs
 
 ## 源与副本
 
-`dsh-agent-cto` 是源，`dsh-agent-one` 是副本（沿用「角色资产 cto 源、one 副本」的惯例）。同步与漂移校验由任务-11 落地。
+`dsh-agent-cto` 是源，`dsh-agent-one` 是副本（沿用「角色资产 cto 源、one 副本」的惯例）。
+
+```bash
+pnpm design:sync    # 镜像同步 design-kit + 三个 UI Skill 到 one
+pnpm design:drift   # 逐字节比对，任何差异退出 1
+```
+
+副本不允许手改：所有改动落在 cto，再 sync。
