@@ -11,6 +11,9 @@ design-kit/
   scripts/validate-tokens.mjs  # 结构 / 类型 / 别名 / 数量校验
   scripts/tokens-to-css.mjs    # 生成 CSS 变量（dist/ 已 gitignore）
   templates/design/            # 项目实例骨架（tokens / components / screens / flows / README）
+  templates/mock/              # 静态 mock 骨架（状态由 URL 参数切换）
+  scripts/screenshot.mjs       # CDP 截图（三视口 × 状态，零第三方依赖）
+  examples/demo-page/          # 截图流水线示例（mock + 12 张 refs）
 ```
 
 规划中（后续任务）：`templates/`（design 骨架与 mock）、`scripts/tokens-to-css.mjs`、`scripts/screenshot.mjs`、`scripts/check.mjs`、`examples/demo-page/`。
@@ -29,7 +32,7 @@ pnpm design:css
 # design-kit/tokens/baseline.json -> design-kit/dist/tokens.css
 ```
 
-- 颜色只输出 `semantic.*`（16 个变量），primitive 不暴露给组件
+- 颜色只输出 `semantic.*`（17 个变量：16 个语义角色 + on-action），primitive 不暴露给组件
 - 暗色是同一批变量在 `[data-theme="dark"]` 下重新解析：先看 semantic 的暗色别名，再沿别名取 primitive 的暗色值
 - 非颜色域直接输出：`--space-*` / `--radius-*` / `--shadow-*` / `--duration-*` / `--easing-*` / `--breakpoint-*` / `--z-*`
 - `--breakpoint-*` 不能用于 media query，仅供 JS 或容器查询参考
@@ -43,6 +46,18 @@ cp -R design-kit/templates/design/. <project>/design/
 sed -i '' 's/{{neutral}}/sand/g; s/{{accent}}/indigo/g' <project>/design/tokens.json
 node design-kit/scripts/validate-tokens.mjs <project>/design/tokens.json
 ```
+
+## 截图
+
+```bash
+export DSH_BROWSER_CDP_URL='ws://127.0.0.1:3000/?token=xxx'
+node design-kit/scripts/screenshot.mjs --mock <mock-dir> --out <refs-dir> --screen <name>
+```
+
+- 三视口：desktop 1440×900 / tablet 1024×768 / mobile 390×844
+- 默认四状态：default / empty / loading / error（列表页加 `--states ...,long-list`）
+- 命名：`<screen>__<viewport>__<theme>__<state>.png`
+- 缺状态时脚本非 0 退出；`prefers-reduced-motion: reduce` 保证可复现
 
 ## 刷新 token
 

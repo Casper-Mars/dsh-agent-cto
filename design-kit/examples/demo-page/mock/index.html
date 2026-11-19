@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN" data-state="default">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>mock · {{SCREEN_NAME}}</title>
+    <link rel="stylesheet" href="tokens.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">Mock</div>
+        <nav>
+          <a class="nav-item is-active" href="#">概览</a>
+          <a class="nav-item" href="#">项目</a>
+          <a class="nav-item" href="#">任务</a>
+          <a class="nav-item" href="#">设置</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="page-head">
+          <div>
+            <h1 class="page-title">设备列表</h1>
+            <p class="page-sub">mock 只用于截图验收，数据为假。</p>
+          </div>
+          <button class="btn btn-primary" type="button">新建</button>
+        </header>
+
+        <section class="card" id="error-banner" hidden>
+          <div class="banner banner-danger">
+            <span>加载失败：连接超时。</span>
+            <button class="btn btn-ghost" type="button">重试</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>名称</th>
+                <th>状态</th>
+                <th>负责人</th>
+                <th>更新时间</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <div class="empty" id="empty" hidden>
+            <p class="empty-title">还没有设备</p>
+            <p class="empty-text">创建第一台设备后，这里会显示状态与负责人。</p>
+            <button class="btn btn-primary" type="button">创建设备</button>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="mock.js"></script>
+  </body>
+</html>

@@ -20,7 +20,7 @@ describe('design-kit tokens-to-css', () => {
   const css = generate()
 
   it('只输出 semantic 颜色：16 个变量 × 明暗两套', () => {
-    expect(css.match(/--color-[a-z-]+:/g)?.length).toBe(32)
+    expect(css.match(/--color-[a-z-]+:/g)?.length).toBe(34)
   })
 
   it('root 与 dark 使用同一组变量名', () => {
@@ -29,7 +29,7 @@ describe('design-kit tokens-to-css', () => {
     expect(cut).toBeGreaterThan(0)
     const rootBlock = css.slice(0, cut)
     const darkBlock = css.slice(cut)
-    expect(names(rootBlock)).toHaveLength(16)
+    expect(names(rootBlock)).toHaveLength(17)
     expect(names(darkBlock)).toEqual(names(rootBlock))
   })
 

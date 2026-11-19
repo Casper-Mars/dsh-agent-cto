@@ -92,7 +92,12 @@ for (const [group, roles] of Object.entries(semantic)) {
 // 4) 颜色 primitive 必须有暗色值
 for (const [scale, steps] of Object.entries(doc.color ?? {})) {
   if (scale.startsWith('$')) continue
+  if (steps && '$value' in steps) {
+    if (!steps.$extensions?.['dsh.modes']?.dark) warnings.push(`color.${scale} 缺少暗色值`)
+    continue
+  }
   for (const [step, token] of Object.entries(steps)) {
+    if (step.startsWith('$')) continue
     if (!token?.$extensions?.['dsh.modes']?.dark) {
       warnings.push(`color.${scale}.${step} 缺少暗色值`)
     }
@@ -102,7 +107,8 @@ for (const [scale, steps] of Object.entries(doc.color ?? {})) {
 // 5) 期望数量（防止误删）
 const expect = [
   [/^color\.[a-z]+\.\d+$/, 72, 'color.<scale>.<1-12>'],
-  [/^semantic\.[a-z-]+\.[a-z-]+$/, 16, 'semantic.<group>.<role>'],
+  [/^color\.(white|black)$/, 2, 'color.white / color.black'],
+  [/^semantic\.[a-z-]+\.[a-z-]+$/, 17, 'semantic.<group>.<role>'],
   [/^type\.scale\.[a-z0-9-]+$/, 9, 'type.scale.*'],
   [/^space\.\d+$/, 12, 'space.*'],
   [/^radius\.[a-z0-9]+$/, 8, 'radius.*'],

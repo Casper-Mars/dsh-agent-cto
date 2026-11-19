@@ -597,6 +597,22 @@
           }
         }
       }
+    },
+    "white": {
+      "$value": "#ffffff",
+      "$extensions": {
+        "dsh.modes": {
+          "dark": "#ffffff"
+        }
+      }
+    },
+    "black": {
+      "$value": "#000000",
+      "$extensions": {
+        "dsh.modes": {
+          "dark": "#000000"
+        }
+      }
     }
   },
   "semantic": {
@@ -629,6 +645,9 @@
       },
       "muted": {
         "$value": "{color.sand.11}"
+      },
+      "on-action": {
+        "$value": "{color.white}"
       }
     },
     "action": {

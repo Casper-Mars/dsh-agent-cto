@@ -42,6 +42,9 @@ for (const scale of SCALES) {
   color[scale] = steps
 }
 
+color.white = { $value: '#ffffff', $extensions: { 'dsh.modes': { dark: '#ffffff' } } }
+color.black = { $value: '#000000', $extensions: { 'dsh.modes': { dark: '#000000' } } }
+
 const semantic = {
   surface: {
     canvas: '{color.sand.1}',
@@ -56,6 +59,7 @@ const semantic = {
   text: {
     primary: '{color.sand.12}',
     muted: '{color.sand.11}',
+    'on-action': '{color.white}',
   },
   action: {
     primary: '{color.indigo.9}',
