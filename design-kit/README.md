@@ -38,6 +38,10 @@ pnpm design:css
 - 非颜色域直接输出：`--space-*` / `--radius-*` / `--shadow-*` / `--duration-*` / `--easing-*` / `--breakpoint-*` / `--z-*`
 - `--breakpoint-*` 不能用于 media query，仅供 JS 或容器查询参考
 
+## 应用到项目
+
+见 `docs/apply-to-project.md`：七步流程、项目 CI 接入、版本与源/副本关系。
+
 ## 实例模板
 
 `templates/design/` 是项目 `design/` 的骨架：复制 → 替换 `{{neutral}}` / `{{accent}}` → 写页面规格。三类清单（必须改 / 不许改 / 留空等人）与七步流程写在 `templates/design/README.md`，不要把模板内容当项目资产提交。

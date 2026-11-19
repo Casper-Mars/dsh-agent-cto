@@ -1,0 +1,33 @@
+name: design-kit
+
+# 设计能力自检：token 基线、示例实例、五类契约校验。
+# 不跑浏览器：refs 已随仓库提交，CI 只验证结构与一致性。
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: design-kit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: tokens + demo + check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: 单元测试
+        run: pnpm test
+      - name: 基线 token 校验
+        run: node design-kit/scripts/validate-tokens.mjs design-kit/tokens/baseline.json
+      - name: 示例实例契约校验
+        run: node design-kit/scripts/check.mjs design-kit/examples/demo-page/design
