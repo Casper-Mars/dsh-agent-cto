@@ -29,6 +29,12 @@ describe('design-kit check', () => {
     expect(a).toEqual(b)
   })
 
+  it('示例实例 design/ 零错误（防止示例与规则漂移）', () => {
+    const example = path.join(root, 'design-kit/examples/demo-page/design')
+    const { errors } = runChecks(example)
+    expect(errors).toEqual([])
+  })
+
   it('干净实例零错误', () => {
     const { errors } = runChecks(clean)
     expect(errors).toEqual([])

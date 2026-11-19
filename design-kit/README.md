@@ -14,7 +14,7 @@ design-kit/
   templates/mock/              # 静态 mock 骨架（状态由 URL 参数切换）
   scripts/screenshot.mjs       # CDP 截图（三视口 × 状态，零第三方依赖）
   scripts/check.mjs            # 契约校验（魔法值 / 别名 / 对比度 / 残留 / 截图覆盖）
-  examples/demo-page/          # 截图流水线示例（mock + 12 张 refs）
+  examples/demo-page/          # 完整实例示例（design/ 四件套 + 12 张 refs）
 ```
 
 规划中（后续任务）：`templates/`（design 骨架与 mock）、`scripts/tokens-to-css.mjs`、`scripts/screenshot.mjs`、`scripts/check.mjs`、`examples/demo-page/`。

@@ -12,6 +12,7 @@
  *   DSH_BROWSER_HOST                      浏览器容器看到的宿主名（默认 host.docker.internal）
  */
 import { createServer } from 'node:http'
+import { existsSync as fileExists, readFileSync } from 'node:fs'
 import { createReadStream, existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
@@ -124,7 +125,22 @@ async function main() {
   const viewports = (args.viewports ?? 'desktop,tablet,mobile').split(',').filter((v) => VIEWPORTS[v])
   const states = (args.states ?? REQUIRED_STATES.join(',')).split(',').filter(Boolean)
 
-  const cdpUrl = args.url ?? process.env.DSH_BROWSER_CDP_URL ?? process.env.BROWSERLESS_URL
+  let cdpUrl = args.url ?? process.env.DSH_BROWSER_CDP_URL ?? process.env.BROWSERLESS_URL
+  if (!cdpUrl && args['env-file'] && fileExists(args['env-file'])) {
+    const env = Object.fromEntries(
+      readFileSync(args['env-file'], 'utf8')
+        .split('\n')
+        .filter((line) => line.includes('=') && !line.trim().startsWith('#'))
+        .map((line) => {
+          const index = line.indexOf('=')
+          return [line.slice(0, index).trim(), line.slice(index + 1).trim().replace(/^["']|["']$/g, '')]
+        }),
+    )
+    if (env.BROWSERLESS_TOKEN) {
+      const port = env.BROWSERLESS_PORT ?? '3000'
+      cdpUrl = `ws://127.0.0.1:${port}/?token=${env.BROWSERLESS_TOKEN}`
+    }
+  }
   if (!cdpUrl) {
     console.error('缺少 CDP 地址：设置 DSH_BROWSER_CDP_URL / BROWSERLESS_URL，或传 --url')
     process.exit(2)

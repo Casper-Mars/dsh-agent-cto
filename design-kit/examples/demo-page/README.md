@@ -1,28 +1,52 @@
-# demo-page（截图流水线示例）
+# demo-page（完整实例示例）
 
-用虚构的「设备列表」验证：mock → 三视口 × 四状态 → 命名规范 → 可复现。
+用虚构的「设备列表」验证整条设计链路：模板 → 实例 → 截图 → 校验。**不涉及任何产品仓库。**
 
 ```
-mock/   index.html / styles.css / mock.js / tokens.css（来自 dist）
-refs/   12 张 PNG：device-list__<viewport>__light__<state>.png
+design/
+  tokens.json          # 由模板填充（sand / indigo）
+  components.md        # DataTable、StatusPill
+  screens/device-list.md
+  flows.md
+  mock/                # mock + tokens.css（生成物）
+  refs/                # 12 张截图：3 视口 × 4 状态
 ```
 
-## 重跑
+## 从零复现
 
 ```bash
-cp design-kit/dist/tokens.css design-kit/examples/demo-page/mock/tokens.css
+cd design-kit/examples/demo-page
 
-export DSH_BROWSER_CDP_URL='ws://127.0.0.1:3000/?token=<browserless-token>'
-node design-kit/scripts/screenshot.mjs \
-  --mock design-kit/examples/demo-page/mock \
-  --out design-kit/examples/demo-page/refs \
-  --screen device-list
+# 1) 模板 → 实例
+mkdir -p design/screens design/refs design/mock
+cp ../../templates/design/tokens.json design/
+cp ../../templates/design/components.md design/
+sed -i '' 's/{{neutral}}/sand/g; s/{{accent}}/indigo/g' design/tokens.json
+
+# 2) 写屏规格（参照 templates/design/screens/_template.md）
+#    design/screens/device-list.md 需含 default/empty/loading/error 四状态
+
+# 3) 生成 tokens.css 并准备 mock
+pnpm design:css
+cp ../../templates/mock/{index.html,styles.css,mock.js} design/mock/
+cp ../../dist/tokens.css design/mock/tokens.css
+
+# 4) 截图（3 视口 × 4 状态）
+node ../../scripts/screenshot.mjs \
+  --mock design/mock --out design/refs --screen device-list \
+  --env-file ~/project/opc/sanding/deployment/.env
+
+# 5) 校验
+node ../../scripts/check.mjs design
 ```
 
-状态由 URL 参数驱动：`?state=default|empty|loading|error|long-list&theme=light|dark`。
+## 验收
+
+- `check.mjs` 0 错误（占位符、魔法值、对比度、状态覆盖）
+- 12 张截图，命名 `<screen>__<viewport>__<theme>__<state>.png`
+- 两次截图逐字节一致（`prefers-reduced-motion: reduce`）
 
 ## 注意
 
-- 截图对字体敏感：宿主机未安装 IBM Plex 时会回退 `system-ui`；正式项目应自托管字体并用 `@font-face` 保证一致。
-- 截图前脚本会设置 `prefers-reduced-motion: reduce`，mock 的骨架屏动画因此关闭，保证两次结果逐字节一致。
-- 这是能力仓的示例，不属于任何产品项目。
+- 宿主机未装 IBM Plex 时字体回退 `system-ui`；正式项目要自托管字体。
+- 这是能力仓示例，不属于任何产品项目。
