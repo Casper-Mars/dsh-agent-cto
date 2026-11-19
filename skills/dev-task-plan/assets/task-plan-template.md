@@ -22,6 +22,8 @@
 - 范围（模块 / 服务）：
 - 依赖：
 - 任务级验收：
+- UI 设计引用（UI 任务必填）：design_ref=<commit sha>；非 UI 任务写「无」
+- 必须覆盖的状态（UI 任务必填）：<screen>: default / empty / loading / error；非 UI 任务写「无」
 - 里程碑：
 
 ## 4. 依赖 DAG
