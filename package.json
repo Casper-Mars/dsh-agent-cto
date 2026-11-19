@@ -39,7 +39,8 @@
     "dist-server/cordis.patch.yml",
     "scripts/verify-install.mjs",
     "skills/",
-    "cordis.patch.yml"
+    "cordis.patch.yml",
+    "design-kit/"
   ],
   "dsh": {
     "bundle": {
@@ -57,7 +58,8 @@
     "verify:install": "node scripts/verify-install.mjs",
     "clean": "rm -rf dist dist-server",
     "prepublishOnly": "pnpm build",
-    "compat": "bash scripts/dsh-compat.sh"
+    "compat": "bash scripts/dsh-compat.sh",
+    "design:validate": "node design-kit/scripts/validate-tokens.mjs"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4.0.5 <5.0.0",
