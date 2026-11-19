@@ -13,6 +13,7 @@ design-kit/
   templates/design/            # 项目实例骨架（tokens / components / screens / flows / README）
   templates/mock/              # 静态 mock 骨架（状态由 URL 参数切换）
   scripts/screenshot.mjs       # CDP 截图（三视口 × 状态，零第三方依赖）
+  scripts/check.mjs            # 契约校验（魔法值 / 别名 / 对比度 / 残留 / 截图覆盖）
   examples/demo-page/          # 截图流水线示例（mock + 12 张 refs）
 ```
 
@@ -46,6 +47,20 @@ cp -R design-kit/templates/design/. <project>/design/
 sed -i '' 's/{{neutral}}/sand/g; s/{{accent}}/indigo/g' <project>/design/tokens.json
 node design-kit/scripts/validate-tokens.mjs <project>/design/tokens.json
 ```
+
+## 校验
+
+```bash
+pnpm design:check <design-dir>
+```
+
+五类检查（有错误退出码 1，输出 `文件:行`）：
+
+1. 样式文件禁止 hex / px 字面量（`tokens.css` 与 `mock/` 原型除外）
+2. semantic 只能指向 color primitive，禁止链式
+3. 正文类语义色在 surface 上的 APCA Lc ≥ 60
+4. 模板残留：`{{...}}` 与 `TODO:`
+5. `screens/*.md` 状态矩阵里的每个状态，三视口都要有 refs
 
 ## 截图
 

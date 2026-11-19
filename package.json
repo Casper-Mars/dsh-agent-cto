@@ -62,7 +62,8 @@
     "design:validate": "node design-kit/scripts/validate-tokens.mjs",
     "design:css": "node design-kit/scripts/tokens-to-css.mjs",
     "design:template": "node design-kit/scripts/build-template-tokens.mjs",
-    "design:shots": "node design-kit/scripts/screenshot.mjs"
+    "design:shots": "node design-kit/scripts/screenshot.mjs",
+    "design:check": "node design-kit/scripts/check.mjs"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4.0.5 <5.0.0",
