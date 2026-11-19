@@ -18,6 +18,7 @@ import { describe, expect, it } from 'vitest'
 import { CTO_DOMAIN } from '../src/domain'
 import { parseFirmwareSkillMarkdown } from '../src/firmware'
 import { CTO_PERSONA } from '../src/persona'
+import { DESIGNER_PERSONA } from '../src/persona-designer'
 
 /** 包根：源码态 `tests/` 的上一级。 */
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url))
@@ -93,6 +94,14 @@ function referencedPaths(content: string): string[] {
   const pattern = /(?:^|[^\w./-])((?:references|assets)\/[\w.\-/]+\.md)(?![\w./-])/g
   return [...new Set([...content.matchAll(pattern)].map((match) => match[1] as string))].sort()
 }
+
+describe('persona 渲染安全', () => {
+  it('persona 不得包含 prompt 变量语法 {{ }}', () => {
+    for (const text of [CTO_PERSONA, DESIGNER_PERSONA]) {
+      expect(text).not.toContain('{{')
+    }
+  })
+})
 
 describe('CTO_DOMAIN 声明', () => {
   it('身份字段稳定，Skill 清单唯一且顺序固定', () => {

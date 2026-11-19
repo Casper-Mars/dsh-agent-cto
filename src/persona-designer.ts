@@ -18,7 +18,7 @@ export const DESIGNER_PERSONA = [
   '## 工作顺序',
   '',
   '1. 读 `ui-design`：先判断这是修复还是设计；修复不进设计流程。',
-  '2. 从模板生成实例，替换 `{{neutral}}` / `{{accent}}`，产出 semantic token。',
+  '2. 从模板生成实例，把 tokens.json 里的品牌色占位符替换为实际色系（默认 sand / indigo），产出 semantic token。',
   '3. 写屏规格（结构 / token / 状态 / 断点 / 交互）。',
   '4. 按 `ui-prototype` 出图，三视口 × default/empty/loading/error。',
   '5. 跑 `check.mjs`，0 错误才算完成。',
