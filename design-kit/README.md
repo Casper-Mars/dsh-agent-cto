@@ -10,6 +10,7 @@ design-kit/
   scripts/build-baseline.mjs   # 从 Radix Colors CSS 重建 baseline
   scripts/validate-tokens.mjs  # 结构 / 类型 / 别名 / 数量校验
   scripts/tokens-to-css.mjs    # 生成 CSS 变量（dist/ 已 gitignore）
+  templates/design/            # 项目实例骨架（tokens / components / screens / flows / README）
 ```
 
 规划中（后续任务）：`templates/`（design 骨架与 mock）、`scripts/tokens-to-css.mjs`、`scripts/screenshot.mjs`、`scripts/check.mjs`、`examples/demo-page/`。
@@ -32,6 +33,16 @@ pnpm design:css
 - 暗色是同一批变量在 `[data-theme="dark"]` 下重新解析：先看 semantic 的暗色别名，再沿别名取 primitive 的暗色值
 - 非颜色域直接输出：`--space-*` / `--radius-*` / `--shadow-*` / `--duration-*` / `--easing-*` / `--breakpoint-*` / `--z-*`
 - `--breakpoint-*` 不能用于 media query，仅供 JS 或容器查询参考
+
+## 实例模板
+
+`templates/design/` 是项目 `design/` 的骨架：复制 → 替换 `{{neutral}}` / `{{accent}}` → 写页面规格。三类清单（必须改 / 不许改 / 留空等人）与七步流程写在 `templates/design/README.md`，不要把模板内容当项目资产提交。
+
+```bash
+cp -R design-kit/templates/design/. <project>/design/
+sed -i '' 's/{{neutral}}/sand/g; s/{{accent}}/indigo/g' <project>/design/tokens.json
+node design-kit/scripts/validate-tokens.mjs <project>/design/tokens.json
+```
 
 ## 刷新 token
 
