@@ -23,7 +23,7 @@ import { CTO_PERSONA } from '../src/persona'
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url))
 const SKILLS_ROOT = path.join(REPO_ROOT, 'skills')
 
-/** 期望的 Skill（顺序 = 决策 → 设计 → 拆任务）。 */
+/** 期望的 Skill（顺序 = 决策 → 设计 → UI → 拆任务）。 */
 const EXPECTED_SKILL_NAMES = [
   'cto-adr',
   'architect-tech-spec',
@@ -35,6 +35,9 @@ const EXPECTED_SKILL_NAMES = [
   'cto-standards',
   'cto-harness-audit',
   'dev-task-plan',
+  'ui-design',
+  'ui-prototype',
+  'ui-handoff',
 ]
 
 /** 人设行数硬上限（方案 §8）。 */

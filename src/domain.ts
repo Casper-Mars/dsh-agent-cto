@@ -1,7 +1,7 @@
 /**
  * `cto` 领域数据：Skill 元数据与 CTO 人设，不依赖任何外部领域包。
  *
- * 单包声明 10 个只读 Skill，覆盖 CTO 的完整职责：决策、设计、评审、治理、拆任务。
+ * 单包声明 13 个只读 Skill，覆盖 CTO 的完整职责：决策、设计（含 UI）、评审、治理、拆任务。
  * {@link CTOSkill} 只存元数据（name / description / dir），SKILL.md 正文由加载器
  * 从 `dir/SKILL.md` 读取，正文不内联进 `src/`。
  *
@@ -45,10 +45,10 @@ function skill(name: string, description: string): CTOSkill {
   return { name, description, dir: skillDir(name) }
 }
 
-/** `cto` 领域：10 个只读 Skill + CTO 人设。 */
+/** `cto` 领域：13 个只读 Skill + CTO 人设。 */
 export const CTO_DOMAIN: CTODomain = {
   id: 'cto',
-  version: '0.3.0',
+  version: '0.3.1',
   displayName: 'CTO Domain',
   personaMarkdown: CTO_PERSONA,
   skills: [
@@ -91,6 +91,18 @@ export const CTO_DOMAIN: CTODomain = {
     skill(
       'dev-task-plan',
       '把已评审的 PRD 与技术方案拆成可分配给开发人员的开发任务计划：负责人、依赖 DAG、里程碑、任务级验收、集成点与风险。只要用户提到拆开发任务、给开发人员分工、排开发计划、协调并行开发、排依赖或里程碑，就使用本技能，即使用户只说「拆任务」「排一下开发计划」。不用于编码操作拆解（文件、函数、提交顺序）、任务派发，或技术方案设计本身。',
+    ),
+    skill(
+      'ui-design',
+      '设计阶段主技能：判断是否该走设计流程，按七步把模板生成项目 design/ 实例（tokens / components / screens / flows），并守住必须改与不许改的边界。只要新增或重做界面、改动结构 / 视觉 / 交互，就先读本技能。',
+    ),
+    skill(
+      'ui-prototype',
+      '用 design-kit 的 mock 模板与截图脚本产出确定性效果图：三视口 × 状态矩阵，命名与可复现规则写死。需要出截图供人工验收或做视觉回归时使用。',
+    ),
+    skill(
+      'ui-handoff',
+      '设计交接契约：design_ref、屏与状态清单、验收口径，以及 dev 实现与 tester 核对的一致性规则。提交 design 卡、拆 dev 卡或验收实现时使用。',
     ),
   ],
 }

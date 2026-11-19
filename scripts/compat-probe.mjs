@@ -22,7 +22,7 @@
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 
-/** 期望随包注册的 10 个领域 Skill（真源是 `scripts/verify-install.mjs`，由单测对齐）。 */
+/** 期望随包注册的 13 个领域 Skill（真源是 `scripts/verify-install.mjs`，由单测对齐）。 */
 export const EXPECTED_SKILLS = [
   'cto-adr',
   'architect-tech-spec',
@@ -34,6 +34,9 @@ export const EXPECTED_SKILLS = [
   'cto-standards',
   'cto-harness-audit',
   'dev-task-plan',
+  'ui-design',
+  'ui-prototype',
+  'ui-handoff',
 ]
 
 /** 期望注册的 3 个 agent preset。 */
