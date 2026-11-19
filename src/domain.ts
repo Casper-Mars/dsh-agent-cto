@@ -1,7 +1,7 @@
 /**
  * `cto` 领域数据：Skill 元数据与 CTO 人设，不依赖任何外部领域包。
  *
- * 单包声明 13 个只读 Skill，覆盖 CTO 的完整职责：决策、设计（含 UI）、评审、治理、拆任务。
+ * 单包声明 14 个只读 Skill，覆盖 CTO 的完整职责：决策、设计（含 UI）、评审、治理、拆任务。
  * {@link CTOSkill} 只存元数据（name / description / dir），SKILL.md 正文由加载器
  * 从 `dir/SKILL.md` 读取，正文不内联进 `src/`。
  *
@@ -45,10 +45,10 @@ function skill(name: string, description: string): CTOSkill {
   return { name, description, dir: skillDir(name) }
 }
 
-/** `cto` 领域：13 个只读 Skill + CTO 人设。 */
+/** `cto` 领域：14 个只读 Skill + CTO 人设。 */
 export const CTO_DOMAIN: CTODomain = {
   id: 'cto',
-  version: '0.3.1',
+  version: '0.3.2',
   displayName: 'CTO Domain',
   personaMarkdown: CTO_PERSONA,
   skills: [
@@ -99,6 +99,10 @@ export const CTO_DOMAIN: CTODomain = {
     skill(
       'ui-prototype',
       '用 design-kit 的 mock 模板与截图脚本产出确定性效果图：三视口 × 状态矩阵，命名与可复现规则写死。需要出截图供人工验收或做视觉回归时使用。',
+    ),
+    skill(
+      'maintainer',
+      '仓库维护分诊：把 issue / 缺陷 / 小改动分成答疑、修复、需求、不做四类，按证据门槛决定出口，并约束对外动作。',
     ),
     skill(
       'ui-handoff',

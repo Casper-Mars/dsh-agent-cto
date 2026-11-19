@@ -6,8 +6,8 @@
  * 旧版的「安装目录」硬编码与 `--home` / 环境变量默认推导已随任务-05 删除；
  * `--assets <dir>` 只用于手工核查其它资产目录，不再是默认路径。
  *
- * 检查清单是本文件的唯一真源：`EXPECTED_SKILLS`（13 个）+ `EXPECTED_ASSETS`（14 个）
- * + `EXPECTED_REFERENCES`（19 个）= 46 项，与包内三个 Skill 的实际布局逐项对应。
+ * 检查清单是本文件的唯一真源：`EXPECTED_SKILLS`（14 个）+ `EXPECTED_ASSETS`（15 个）
+ * + `EXPECTED_REFERENCES`（20 个）= 49 项，与包内三个 Skill 的实际布局逐项对应。
  * 新增 / 删除随包文件时必须同步本清单与 `tests/verify-install.spec.ts` 的计数断言。
  *
  * 退出码：全 PASS 为 0，有 FAIL 为 1，参数 / 环境错误（目录不存在、未知参数）为 2。
@@ -34,6 +34,7 @@ export const EXPECTED_SKILLS = [
   'ui-design',
   'ui-prototype',
   'ui-handoff',
+  'maintainer',
 ]
 
 /**
@@ -58,6 +59,7 @@ export const EXPECTED_ASSETS = [
   { skill: 'ui-design', file: 'assets/screen-spec.md' },
   { skill: 'ui-prototype', file: 'assets/shot-plan.md' },
   { skill: 'ui-handoff', file: 'assets/handoff-note.md' },
+  { skill: 'maintainer', file: 'assets/triage-note.md' },
 ]
 
 /** `references/` 下的随包文件（16 个）。 */
@@ -82,6 +84,7 @@ export const EXPECTED_REFERENCES = [
   { skill: 'ui-design', file: 'references/checklist.md' },
   { skill: 'ui-prototype', file: 'references/viewports.md' },
   { skill: 'ui-handoff', file: 'references/card-fields.md' },
+  { skill: 'maintainer', file: 'references/checklist.md' },
 ]
 export const EXPECTED_FILES = [...EXPECTED_ASSETS, ...EXPECTED_REFERENCES]
 

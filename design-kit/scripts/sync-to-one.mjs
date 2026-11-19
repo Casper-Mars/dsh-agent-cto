@@ -16,7 +16,7 @@ import process from 'node:process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 export const SKIP_DIRS = new Set(['dist', 'node_modules', '.git'])
-export const SKILLS = ['ui-design', 'ui-prototype', 'ui-handoff']
+export const SKILLS = ['ui-design', 'ui-prototype', 'ui-handoff', 'maintainer']
 
 /** 递归列出相对路径（排除 skip 目录），按字典序。 */
 export function listFiles(root, skip = SKIP_DIRS) {

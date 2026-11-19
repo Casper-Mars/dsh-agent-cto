@@ -37,6 +37,7 @@ const EXPECTED_SKILL_NAMES = [
   'dev-task-plan',
   'ui-design',
   'ui-prototype',
+  'maintainer',
   'ui-handoff',
 ]
 
