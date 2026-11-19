@@ -30,7 +30,11 @@
       "default": "./dist-server/assets.js"
     },
     "./cordis.patch.yml": "./cordis.patch.yml",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./assets/designer": {
+      "types": "./dist-server/types/assets-designer.d.ts",
+      "default": "./dist-server/assets-designer.js"
+    }
   },
   "files": [
     "dist-server/**/*.js",

@@ -43,6 +43,19 @@
             name: '@deepseek-ai/dsh-tool-web'
           - id: tool-schedule
             name: '@deepseek-ai/dsh-tool-schedule'
+          - id: tool-subagent
+            name: '@deepseek-ai/dsh-tool-subagent'
+            config:
+              provider: spawn
+              toolName: delegate
+              agentPreset: designer
+              allowedAgentPresets:
+                - designer
+              maxDepth: 2
+          - id: tool-subagent-control
+            name: '@deepseek-ai/dsh-tool-subagent-control'
+          - id: tool-subagent-list-agents
+            name: '@deepseek-ai/dsh-tool-subagent-control/list-agents'
           - id: planning
             name: cordis:group
             group: true
@@ -74,3 +87,24 @@
                 name: '@deepseek-ai/dsh-workflow-ptc'
               - id: tool-workflow
                 name: '@deepseek-ai/dsh-tool-workflow'
+
+    - id: preset-designer
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: designer
+        name: 设计师
+        description: 界面设计：token、屏规格、效果图与交接。
+        order: 40
+        plugins:
+          - id: designer-assets
+            name: dsh-agent-cto/assets/designer
+          - id: tool-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+          - id: tool-bash
+            name: '@deepseek-ai/dsh-tool-bash'
+          - id: tool-skill
+            name: '@deepseek-ai/dsh-tool-skill'
+          - id: tool-todo
+            name: '@deepseek-ai/dsh-tool-todo'
+            config:
+              allowParallelInProgress: false
