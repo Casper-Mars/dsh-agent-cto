@@ -45,6 +45,7 @@ Skill）与 `agent-preset-registry.default: cto`。宿主层不再有 `cto-domai
 |------|----------|------|
 | `cto-adr` | 技术选型、架构边界、build vs buy、技术路线、技术债偿还、不可逆技术决策 | ADR：决策、选项（含「不做」）、取舍理由、代价与风险、退出条件 |
 | `architect-tech-spec` | 技术方案、可行性与影响面评估、数据模型、接口契约、时序 / 流程设计、部署与观测 | 技术方案：模块、数据、接口、流程、部署、观测、回滚 |
+| `cto-brief` | 一页给决策人看、方案太长读不下去、评审前要结论与取舍、把既有方案降维 | 决策简报（≤600 字六段） |
 | `cto-arch-review` | 方案评审、架构评审、设计评审、上线前架构复核 | 评审报告：通过/有条件通过/驳回 + 分级问题 |
 | `cto-code-review` | PR 评审、合并前检查、核心模块变更 | PR 评审：九维检查 + blocker/major/minor |
 | `cto-tech-debt` | 技术债登记、排序、偿还计划、遗留系统 | 债务登记表 + 偿还计划 |
@@ -64,18 +65,18 @@ Skill）与 `agent-preset-registry.default: cto`。宿主层不再有 `cto-domai
 
 ```bash
 pnpm typecheck        # tsc --noEmit
-pnpm test             # vitest run：5 个 spec、141 个用例
+pnpm test             # vitest run：11 个 spec、212 个用例
 pnpm build            # 产出 dist-server/（含 cordis.patch.yml 副本）
-pnpm verify:install   # 49/49 PASS：14 个 SKILL.md + 15 个 assets + 20 个 references
+pnpm verify:install   # 52/52 PASS：15 个 SKILL.md + 16 个 assets + 21 个 references
 make check            # build → test → verify → pack
 ```
 
 | 命令 | 成功判据 |
 |------|----------|
 | `pnpm typecheck` | 退出码 0，无类型错误 |
-| `pnpm test` | **141 passed**、0 failed、0 skipped，退出码 0 |
+| `pnpm test` | **212 passed**、0 failed、0 skipped，退出码 0 |
 | `pnpm build` | 退出码 0，产出 `dist-server/index.js` 与 `dist-server/cordis.patch.yml` |
-| `pnpm verify:install` | 37 行 `PASS`、退出码 0；任一 `FAIL` 退出码 1；目录 / 参数错误退出码 2 |
+| `pnpm verify:install` | 52 行 `PASS`、退出码 0；任一 `FAIL` 退出码 1；目录 / 参数错误退出码 2 |
 | `make check` | 上述 build / test / verify 全通过，且 `npm pack --dry-run` 清单正常 |
 
 `verify:install` 默认检查**包内** `skills/`，不需要安装到 profile；`--assets <dir>` 仅用于手工
@@ -108,7 +109,7 @@ node scripts/verify-install.mjs --assets /path/to/skills
 │  ├─ persona.ts                 # CTO_PERSONA：CTO 的全部行为规则（人设唯一来源，≤ 90 行）
 │  └─ firmware.ts                # SKILL.md 读取 / frontmatter 解析 / SkillRegistration 构造
 ├─ dist-server/                  # 构建产物：pnpm build 生成，git 忽略，不手工编辑
-├─ skills/                       # 唯一的 Skill 源（14 个只读 Skill，随包发布）
+├─ skills/                       # 唯一的 Skill 源（15 个只读 Skill，随包发布）
 │  ├─ cto-adr/
 │  │  ├─ SKILL.md
 │  │  ├─ assets/                 # adr-template.md / roadmap-template.md
@@ -117,13 +118,17 @@ node scripts/verify-install.mjs --assets /path/to/skills
 │  │  ├─ SKILL.md
 │  │  ├─ assets/doc-template.md
 │  │  └─ references/             # checklists / data-and-api / example
+│  ├─ cto-brief/
+│  │  ├─ SKILL.md
+│  │  ├─ assets/brief-template.md
+│  │  └─ references/brief-vs-spec.md
 │  └─ dev-task-plan/
 │     ├─ SKILL.md
 │     ├─ assets/task-plan-template.md
 │     └─ references/checklists.md
 ├─ scripts/
 │  ├─ copy-assets.mjs            # 把 cordis.patch.yml 复制进 dist-server/
-│  └─ verify-install.mjs         # 37 项包内自检（CLI + 导出纯函数）
+│  └─ verify-install.mjs         # 52 项包内自检（CLI + 导出纯函数）
 ├─ tests/                        # 5 个 spec：domain / plugin / patch / firmware-registration / verify-install
 ├─ AGENTS.md
 └─ README.md
@@ -132,7 +137,7 @@ node scripts/verify-install.mjs --assets /path/to/skills
 ### 运行时装配
 
 1. `cordis.patch.yml` 插入 `agent-preset-registry`（default=`cto`）与 preset `cto`；
-2. preset 首项挂 `dsh-agent-cto/assets`：它在每个 agent 的 scope 里注册 14 个 Skill（正文读
+2. preset 首项挂 `dsh-agent-cto/assets`：它在每个 agent 的 scope 里注册 15 个 Skill（正文读
    `skills/<name>/SKILL.md`）与 CTO persona（`deployment:persona-prefix` 槽位）；
    注册中途失败原子回滚，卸载按 LIFO 反注册；
 3. persona 与 Skill 都落在 **preset 层**：单 host 装多个角色包时不会并成一份，
@@ -146,7 +151,7 @@ node scripts/verify-install.mjs --assets /path/to/skills
 - `src/plugin.ts` / `src/firmware.ts` 与 `dsh-agent-dev`、`dsh-agent-pm` 同源：改注入器或加载器
   必须三仓同改并各自跑测试。
 - 角色包不做子 agent 编排，不挂 `tool-subagent`；跨角色协作走驿传派单。
-- 十个技能的 `description` / `whenToUse` 必须互斥，不得出现其它技能名（防路由串线）。
+- 所有技能的 `description` / `whenToUse` 必须互斥，不得出现其它技能名（防路由串线）。
 - 本轮不发布 npm，只用本地 `link:` 装配验收。
 
 ## 验收记录

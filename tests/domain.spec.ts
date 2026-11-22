@@ -28,6 +28,7 @@ const SKILLS_ROOT = path.join(REPO_ROOT, 'skills')
 const EXPECTED_SKILL_NAMES = [
   'cto-adr',
   'architect-tech-spec',
+  'cto-brief',
   'cto-arch-review',
   'cto-code-review',
   'cto-tech-debt',

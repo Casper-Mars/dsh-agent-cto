@@ -26,6 +26,7 @@ import { pathToFileURL } from 'node:url'
 export const EXPECTED_SKILLS = [
   'cto-adr',
   'architect-tech-spec',
+  'cto-brief',
   'cto-arch-review',
   'cto-code-review',
   'cto-tech-debt',

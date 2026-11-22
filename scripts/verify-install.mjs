@@ -6,8 +6,8 @@
  * 旧版的「安装目录」硬编码与 `--home` / 环境变量默认推导已随任务-05 删除；
  * `--assets <dir>` 只用于手工核查其它资产目录，不再是默认路径。
  *
- * 检查清单是本文件的唯一真源：`EXPECTED_SKILLS`（14 个）+ `EXPECTED_ASSETS`（15 个）
- * + `EXPECTED_REFERENCES`（20 个）= 49 项，与包内三个 Skill 的实际布局逐项对应。
+ * 检查清单是本文件的唯一真源：`EXPECTED_SKILLS`（15 个）+ `EXPECTED_ASSETS`（16 个）
+ * + `EXPECTED_REFERENCES`（21 个）= 52 项，与包内三个 Skill 的实际布局逐项对应。
  * 新增 / 删除随包文件时必须同步本清单与 `tests/verify-install.spec.ts` 的计数断言。
  *
  * 退出码：全 PASS 为 0，有 FAIL 为 1，参数 / 环境错误（目录不存在、未知参数）为 2。
@@ -23,6 +23,7 @@ import { fileURLToPath } from 'node:url'
 export const EXPECTED_SKILLS = [
   'cto-adr',
   'architect-tech-spec',
+  'cto-brief',
   'cto-arch-review',
   'cto-code-review',
   'cto-tech-debt',
@@ -48,6 +49,7 @@ export const EXPECTED_ASSETS = [
   { skill: 'cto-adr', file: 'assets/adr-template.md' },
   { skill: 'cto-adr', file: 'assets/roadmap-template.md' },
   { skill: 'architect-tech-spec', file: 'assets/doc-template.md' },
+  { skill: 'cto-brief', file: 'assets/brief-template.md' },
   { skill: 'cto-arch-review', file: 'assets/review-report.md' },
   { skill: 'cto-code-review', file: 'assets/pr-review.md' },
   { skill: 'cto-tech-debt', file: 'assets/debt-register.md' },
@@ -71,6 +73,7 @@ export const EXPECTED_REFERENCES = [
   { skill: 'architect-tech-spec', file: 'references/checklists.md' },
   { skill: 'architect-tech-spec', file: 'references/data-and-api.md' },
   { skill: 'architect-tech-spec', file: 'references/example.md' },
+  { skill: 'cto-brief', file: 'references/brief-vs-spec.md' },
   { skill: 'cto-arch-review', file: 'references/review-checklist.md' },
   { skill: 'cto-arch-review', file: 'references/failure-modes.md' },
   { skill: 'cto-code-review', file: 'references/review-dimensions.md' },

@@ -1,7 +1,7 @@
 /**
  * `cto` 领域数据：Skill 元数据与 CTO 人设，不依赖任何外部领域包。
  *
- * 单包声明 14 个只读 Skill，覆盖 CTO 的完整职责：决策、设计（含 UI）、评审、治理、拆任务。
+ * 单包声明 15 个只读 Skill，覆盖 CTO 的完整职责：决策、设计（含 UI）、评审、治理、拆任务。
  * {@link CTOSkill} 只存元数据（name / description / dir），SKILL.md 正文由加载器
  * 从 `dir/SKILL.md` 读取，正文不内联进 `src/`。
  *
@@ -45,10 +45,10 @@ function skill(name: string, description: string): CTOSkill {
   return { name, description, dir: skillDir(name) }
 }
 
-/** `cto` 领域：14 个只读 Skill + CTO 人设。 */
+/** `cto` 领域：15 个只读 Skill + CTO 人设。 */
 export const CTO_DOMAIN: CTODomain = {
   id: 'cto',
-  version: '0.3.3',
+  version: '0.4.0',
   displayName: 'CTO Domain',
   personaMarkdown: CTO_PERSONA,
   skills: [
@@ -59,6 +59,10 @@ export const CTO_DOMAIN: CTODomain = {
     skill(
       'architect-tech-spec',
       '把已评审的 PRD 与 ADR 变成可实施的技术方案，覆盖模块、数据、接口、流程、部署与观测。只要用户提到技术方案、可行性或影响面评估、数据模型、接口契约、时序/流程设计、部署方案、观测方案，就使用本技能，无论输入是规范 PRD、工单、会议纪要还是口头描述。不用于业务价值判断、需求取舍、不可逆架构选型或开发任务拆解。',
+    ),
+    skill(
+      'cto-brief',
+      '把技术方案、评审结论或架构决策压成一页决策简报，供不看细节的人拍板；也用于把一份既有方案降维成可读版。不用于编写完整技术方案、代码评审与任务拆解。',
     ),
     skill(
       'cto-arch-review',
