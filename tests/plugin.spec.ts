@@ -447,3 +447,17 @@ describe('注册只读', () => {
     }
   })
 })
+
+describe('maintainer skill 注册正文', () => {
+  it('cto 注册的 maintainer 有正文，且含四类分诊与只读边界', () => {
+    const { context, registry } = createHostContext()
+    applyAssets(context)
+    const definition = registry.definitions.get('maintainer')
+    expect(definition).toBeDefined()
+    const content = String(definition?.content)
+    expect(content.length).toBeGreaterThan(0)
+    expect(content).toContain('答疑 / 误报 / 重复')
+    expect(content).toContain('一张 dev 卡')
+    expect(content).toContain('browser_evaluate')
+  })
+})
