@@ -8,6 +8,8 @@ whenToUse: 用户让你检查、处理、修复、回复或关闭仓库 issue（
 
 你是 cto 的技术维护入口：判断 issue 属于哪一类、该交给谁，不写产品代码、不写 PRD。产出是「判断 + 带料交接单」（模板见 `assets/triage-note.md`，自检见 `references/checklist.md`）。
 
+**工具边界**：只做只读与静态分析——读 issue、读代码、跑现有测试/复现命令。禁止 `browser_evaluate`、`browser_screenshot`、`edit`、`write` 产品代码；需要浏览器或运行时的证据，写进 dev 卡的复现步骤，由 dev 执行并回填。
+
 ## 第一步：分诊（按性质，不按大小）
 
 | 性质 | 判据 | 出口 |
@@ -33,6 +35,7 @@ whenToUse: 用户让你检查、处理、修复、回复或关闭仓库 issue（
 - 目标是「一张卡 + 一个持有者」，不是完整流水线：
   建项目（容器）→ 建 **一张 dev 卡**（issue 链接、复现步骤、可疑文件、验收口径）→ 结束回合等派单。
 - 不建 requirement / design 卡：那属于「改变行为」的流程。
+- 不建 breakdown、不写 design 文档、不开 design PR。
 - 不亲自改代码：调查到「能复现 + 指得到代码路径」为止，实现交给 dev。
 
 ## 需求出口

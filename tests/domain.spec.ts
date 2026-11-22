@@ -246,3 +246,36 @@ describe('CTO 人设', () => {
     expect(CTO_PERSONA).toContain('- [ ]')
   })
 })
+
+describe('维护分诊入口（maintainer 归 CTO）', () => {
+  const maintainer = readFileSync(path.join(SKILLS_ROOT, 'maintainer', 'SKILL.md'), 'utf8')
+  const taskPlan = readFileSync(path.join(SKILLS_ROOT, 'dev-task-plan', 'SKILL.md'), 'utf8')
+
+  it('四类分诊与修复出口写死：答疑 / 修复 / 需求 / 不做，修复只出 1 张 dev 卡', () => {
+    expect(maintainer).toContain('答疑 / 误报 / 重复')
+    expect(maintainer).toContain('修复 | 恢复既有预期行为')
+    expect(maintainer).toContain('需求 | 改变行为、范围或验收口径')
+    expect(maintainer).toContain('不做 | 超范围 / 不成立')
+    expect(maintainer).toContain('一张 dev 卡')
+    expect(maintainer).toContain('不建 requirement / design 卡')
+    expect(maintainer).toContain('不建 breakdown')
+    expect(maintainer).toContain('不开 design PR')
+  })
+
+  it('CTO 维护分诊只做只读/静态分析，禁止 browser/edit/write 产品代码', () => {
+    expect(maintainer).toContain('只读与静态分析')
+    for (const forbidden of ['browser_evaluate', 'browser_screenshot', 'edit', 'write']) {
+      expect(maintainer).toContain(forbidden)
+    }
+    expect(CTO_PERSONA).toContain('browser_evaluate')
+    expect(CTO_PERSONA).toContain('browser_screenshot')
+    expect(CTO_PERSONA).toContain('1 张 dev 卡')
+  })
+
+  it('dev-task-plan 只用于需求类，且不写 token/step 预算、不往 dispatch 加 budget', () => {
+    expect(taskPlan).toContain('只用于「需求」类')
+    expect(taskPlan).toContain('修复类由 `maintainer` 直接出 1 张 dev 卡')
+    expect(taskPlan).toContain('不加 `budget`')
+    expect(taskPlan).not.toMatch(/\bFast\b|\bStandard\b|\bDeep\b/)
+  })
+})
