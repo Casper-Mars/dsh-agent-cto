@@ -48,7 +48,7 @@ function skill(name: string, description: string): CTOSkill {
 /** `cto` 领域：14 个只读 Skill + CTO 人设。 */
 export const CTO_DOMAIN: CTODomain = {
   id: 'cto',
-  version: '0.3.2',
+  version: '0.3.3',
   displayName: 'CTO Domain',
   personaMarkdown: CTO_PERSONA,
   skills: [
