@@ -7,7 +7,8 @@
  *
  * 注意 Skill 的可见性不在宿主层断言：领域 Skill 由 `dsh-agent-cto/assets` 挂在
  * preset 层，宿主 ctx 的 `skills.list()` 看不到它们（这是有意设计）。本探针只验证
- * ① skills 服务契约未变、② preset roster 含本角色、③ preset 声明了资产插件；
+ * ① skills 服务契约未变、② preset roster 含本角色、③ preset 声明的子插件列表里有
+ * 角色资产插件（经 `agentPresets/read` 读回；roster 本身不含 plugins 字段）；
  * 真正的逐 preset 可见性由部署侧的验收脚本负责。
  *
  * 用法（由 dsh-compat.sh 调用，必须从 dsh 安装目录运行，裸导入才能解析）：
@@ -22,7 +23,7 @@
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 
-/** 期望随包注册的 14 个领域 Skill（真源是 `scripts/verify-install.mjs`，由单测对齐）。 */
+/** 期望随包发布的 15 个领域 Skill（真源是 `scripts/verify-install.mjs`，由单测对齐）。 */
 export const EXPECTED_SKILLS = [
   'cto-adr',
   'architect-tech-spec',
@@ -41,7 +42,7 @@ export const EXPECTED_SKILLS = [
   'maintainer',
 ]
 
-/** 期望注册的 3 个 agent preset。 */
+/** 期望注册的 1 个本角色 agent preset（`designer` 走子 agent 委派路径，不在本探针断言内）。 */
 export const EXPECTED_PRESETS = ['cto']
 
 /** 主会话默认 preset（`agent-preset-registry.default`）。 */
@@ -102,20 +103,23 @@ async function main() {
       const roster = await presets.list()
       const ids = new Set(roster.map((item) => item.id ?? item.config?.id))
       const missing = EXPECTED_PRESETS.filter((id) => !ids.has(id))
-      if (missing.length === 0) pass(`${EXPECTED_PRESETS.length} 个 agent preset 均已注册`)
+      if (missing.length === 0) pass(`agent preset 已注册：${EXPECTED_PRESETS.join('、')}`)
       else fail(`缺少 preset：${missing.join('、')}`)
 
       const defaultId = presets.defaultId
       if (defaultId === EXPECTED_DEFAULT_PRESET) pass(`主会话默认 preset = ${defaultId}`)
       else fail(`主会话默认 preset 是 "${String(defaultId)}"，期望 "${EXPECTED_DEFAULT_PRESET}"`)
 
-      // roster 若带插件列表，就验证资产插件确实挂在 preset 里；不带则跳过（不假装断言）。
-      const own = roster.find((item) => (item.id ?? item.config?.id) === EXPECTED_DEFAULT_PRESET)
-      const declared = own?.plugins ?? own?.config?.plugins
-      if (Array.isArray(declared)) {
-        const hasAssets = declared.some((entry) => String(entry?.name ?? '').includes('dsh-agent-cto/assets'))
-        if (hasAssets) pass('preset 声明了角色资产插件 dsh-agent-cto/assets')
-        else fail('preset 未声明 dsh-agent-cto/assets：领域 Skill 不会进 preset 层')
+      // roster 条目只暴露 id / name / description / order / broken（不含 plugins），
+      // 因此不能从 roster 读插件列表。改用 `agentPresets/read`（服务方法 readDocument）
+      // 取该 preset 声明的子插件列表 YAML，在其中核验角色资产插件确实挂在 preset 里。
+      if (typeof presets.readDocument !== 'function') {
+        fail('ctx.agentPresets 缺少 readDocument()：无法核验 preset 声明的子插件列表')
+      } else {
+        const document = await presets.readDocument(EXPECTED_DEFAULT_PRESET)
+        const content = typeof document === 'string' ? document : String(document?.content ?? '')
+        if (content.includes('dsh-agent-cto/assets')) pass('preset 声明了角色资产插件 dsh-agent-cto/assets')
+        else fail(`preset ${EXPECTED_DEFAULT_PRESET} 未声明 dsh-agent-cto/assets：领域 Skill 不会进 preset 层`)
       }
     }
   } catch (error) {
