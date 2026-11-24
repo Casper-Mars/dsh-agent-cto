@@ -36,6 +36,7 @@ const EXPECTED_PLUGINS = [
   { id: 'tool-web', name: '@deepseek-ai/dsh-tool-web' },
   { id: 'tool-schedule', name: '@deepseek-ai/dsh-tool-schedule' },
   { id: 'tool-subagent', name: '@deepseek-ai/dsh-tool-subagent' },
+  { id: 'tool-subagent-fork', name: '@deepseek-ai/dsh-tool-subagent' },
   { id: 'tool-subagent-control', name: '@deepseek-ai/dsh-tool-subagent-control' },
   { id: 'planning', name: 'cordis:group' },
   { id: 'workflow', name: 'cordis:group' },
@@ -133,15 +134,15 @@ describe('cordis.patch.yml preset 配置', () => {
 
   it('preset-cto 的 plugins 恰好 15 项，id / name 顺序与契约一致', () => {
     const plugins = presetPlugins()
-    expect(plugins).toHaveLength(15)
+    expect(plugins).toHaveLength(16)
     expect(plugins.map((item) => item.id)).toEqual(EXPECTED_PLUGINS.map((item) => item.id))
     expect(plugins.map((item) => item.name)).toEqual(EXPECTED_PLUGINS.map((item) => item.name))
   })
 
-  it('数量守卫：preset-cto 的 plugins 恰好 15 项', () => {
+  it('数量守卫：preset-cto 的 plugins 恰好 16 项', () => {
     const plugins = presetPlugins()
-    expect(plugins.length, `工具数不足 15（当前 ${plugins.length} 项）`).toBeGreaterThanOrEqual(15)
-    expect(plugins.length, `工具数超过 15（当前 ${plugins.length} 项）`).toBeLessThanOrEqual(15)
+    expect(plugins.length, `工具数不足 16（当前 ${plugins.length} 项）`).toBeGreaterThanOrEqual(16)
+    expect(plugins.length, `工具数超过 16（当前 ${plugins.length} 项）`).toBeLessThanOrEqual(16)
   })
 
   it('tool-presentation 固定 ptc 呈现方式', () => {
@@ -158,7 +159,7 @@ describe('cordis.patch.yml preset 配置', () => {
 
   it('除 tool-todo / tool-subagent / cordis:group 外不得带 config（防止误加覆盖）', () => {
     const groups = new Set(['planning', 'workflow'])
-    const withConfig = new Set(['tool-todo', 'tool-subagent', 'tool-presentation'])
+    const withConfig = new Set(['tool-todo', 'tool-subagent', 'tool-subagent-fork', 'tool-presentation'])
     const others = presetPlugins().filter((item) => !withConfig.has(String(item.id)) && !groups.has(String(item.id)))
     expect(others.length).toBeGreaterThan(0)
     for (const item of others) {
@@ -170,6 +171,7 @@ describe('cordis.patch.yml preset 配置', () => {
     const ids = presetPlugins().map((item) => item.id)
     expect(ids).toContain('tool-web')
     expect(ids).toContain('tool-subagent')
+    expect(ids).toContain('tool-subagent-fork')
     expect(ids).toContain('tool-subagent-control')
     expect(ids).not.toContain('tool-subagent-list-agents')
   })
