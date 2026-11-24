@@ -4,8 +4,8 @@
  * 断言分三层：
  *   1. 外层形状：恰好一个 `insert` 条目，且**没有任何**直接挂在外层的覆盖条目；
  *   2. 插入顺序与身份：领域插件 / preset 注册表 / 唯一 preset，id 顺序固定；
- *   3. 工具面：恰好 15 项（角色资产 + echuan/task 子路径 + 8 个工具 + plan-mode 组 + workflow 组），顺序固定；
- *   4. 工具面只允许 tool-todo 与 cordis:group 带 config，其余工具带 config 即失败（防误加覆盖）。
+ *   3. 工具面：恰好 16 项（角色资产 + 呈现方式 + echuan/task 子路径 + 8 个工具 + plan-mode 组 + workflow 组），顺序固定；
+ *   4. 工具面只允许 tool-todo、tool-subagent、tool-presentation 与 cordis:group 带 config，其余工具带 config 即失败（防误加覆盖）。
  *
  * 结构断言一律走真实 YAML 解析（`yaml` 包），不用正则猜结构；只有「全文禁词」
  * 用源码扫描，因为它要覆盖注释等非结构位置。
@@ -25,6 +25,7 @@ const PRESET_PACKAGE = '@deepseek-ai/dsh-agent-preset'
 /** 工具面契约：顺序、id、npm 包名都固定，不多不少。 */
 const EXPECTED_PLUGINS = [
   { id: 'cto-assets', name: 'dsh-agent-cto/assets' },
+  { id: 'tool-presentation', name: '@deepseek-ai/dsh-agent-tool-presentation' },
   { id: 'echuan-tools', name: 'dsh-echuan/tools/requester' },
   { id: 'task-tools', name: 'dsh-agent-base/tools/task-leader' },
   { id: 'tool-fs', name: '@deepseek-ai/dsh-tool-fs' },
@@ -131,17 +132,23 @@ describe('cordis.patch.yml preset 配置', () => {
     expect((config.description as string).trim()).not.toBe('')
   })
 
-  it('preset-cto 的 plugins 恰好 13 项，id / name 顺序与契约一致', () => {
+  it('preset-cto 的 plugins 恰好 16 项，id / name 顺序与契约一致', () => {
     const plugins = presetPlugins()
-    expect(plugins).toHaveLength(15)
+    expect(plugins).toHaveLength(16)
     expect(plugins.map((item) => item.id)).toEqual(EXPECTED_PLUGINS.map((item) => item.id))
     expect(plugins.map((item) => item.name)).toEqual(EXPECTED_PLUGINS.map((item) => item.name))
   })
 
-  it('数量守卫：preset-cto 的 plugins 恰好 13 项', () => {
+  it('数量守卫：preset-cto 的 plugins 恰好 16 项', () => {
     const plugins = presetPlugins()
-    expect(plugins.length, `工具数不足 15（当前 ${plugins.length} 项）`).toBeGreaterThanOrEqual(15)
-    expect(plugins.length, `工具数超过 15（当前 ${plugins.length} 项）`).toBeLessThanOrEqual(15)
+    expect(plugins.length, `工具数不足 16（当前 ${plugins.length} 项）`).toBeGreaterThanOrEqual(16)
+    expect(plugins.length, `工具数超过 16（当前 ${plugins.length} 项）`).toBeLessThanOrEqual(16)
+  })
+
+  it('tool-presentation 固定 ptc 呈现方式', () => {
+    const row = presetPlugins().find((item) => item.id === 'tool-presentation')
+    expect(row, 'preset.plugins 缺少 tool-presentation').toBeDefined()
+    expect(configOf(row as PatchPlugin).mode).toBe('ptc')
   })
 
   it('tool-todo 固定 allowParallelInProgress: false', () => {
@@ -152,7 +159,7 @@ describe('cordis.patch.yml preset 配置', () => {
 
   it('除 tool-todo / tool-subagent / cordis:group 外不得带 config（防止误加覆盖）', () => {
     const groups = new Set(['planning', 'workflow'])
-    const withConfig = new Set(['tool-todo', 'tool-subagent'])
+    const withConfig = new Set(['tool-todo', 'tool-subagent', 'tool-presentation'])
     const others = presetPlugins().filter((item) => !withConfig.has(String(item.id)) && !groups.has(String(item.id)))
     expect(others.length).toBeGreaterThan(0)
     for (const item of others) {

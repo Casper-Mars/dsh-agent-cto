@@ -27,6 +27,12 @@
         plugins:
           - id: cto-assets
             name: dsh-agent-cto/assets
+          # 工具呈现方式（agent scope 级）：ptc = 模型只看得到 run_code + 由可见工具
+          # 生成的 TS SDK，其余工具在程序内调用。回退只需把 mode 改成 native。
+          - id: tool-presentation
+            name: '@deepseek-ai/dsh-agent-tool-presentation'
+            config:
+              mode: ptc
           - id: echuan-tools
             name: dsh-echuan/tools/requester
           - id: task-tools
