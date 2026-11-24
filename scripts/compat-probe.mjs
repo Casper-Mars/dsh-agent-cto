@@ -22,7 +22,7 @@
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 
-/** 期望随包注册的 14 个领域 Skill（真源是 `scripts/verify-install.mjs`，由单测对齐）。 */
+/** 期望随包发布的 15 个领域 Skill（真源是 `scripts/verify-install.mjs`，由单测对齐）。 */
 export const EXPECTED_SKILLS = [
   'cto-adr',
   'architect-tech-spec',
@@ -41,7 +41,7 @@ export const EXPECTED_SKILLS = [
   'maintainer',
 ]
 
-/** 期望注册的 3 个 agent preset。 */
+/** 期望注册的 1 个本角色 agent preset（`designer` 走子 agent 委派路径，不在本探针断言内）。 */
 export const EXPECTED_PRESETS = ['cto']
 
 /** 主会话默认 preset（`agent-preset-registry.default`）。 */
@@ -102,7 +102,7 @@ async function main() {
       const roster = await presets.list()
       const ids = new Set(roster.map((item) => item.id ?? item.config?.id))
       const missing = EXPECTED_PRESETS.filter((id) => !ids.has(id))
-      if (missing.length === 0) pass(`${EXPECTED_PRESETS.length} 个 agent preset 均已注册`)
+      if (missing.length === 0) pass(`agent preset 已注册：${EXPECTED_PRESETS.join('、')}`)
       else fail(`缺少 preset：${missing.join('、')}`)
 
       const defaultId = presets.defaultId

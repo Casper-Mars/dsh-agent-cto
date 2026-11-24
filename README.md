@@ -5,9 +5,9 @@
 `dsh-agent-cto` 是 dsh 的 **CTO（技术决策者 + 架构师）领域原生单包**：装这一个包，就能得到
 
 - **CTO persona**：由 preset 层的 `cto-assets` 注册进该 preset 的 system prompt，随 preset 组合启停；
-- **14 个只读领域 Skill**：决策、设计、评审、治理、拆任务五类职责，随包发布在
+- **15 个只读领域 Skill**：决策、设计、评审、治理、拆任务五类职责，随包发布在
   `skills/`，由 **preset 层**的 `dsh-agent-cto/assets` 注册进该 preset 的 scope；
-- **1 个 agent preset**：`cto`，由 `cordis.patch.yml` 装配。
+- **2 个 agent preset**：`cto`（主会话默认）与 `designer`（界面设计角色），由 `cordis.patch.yml` 装配。
 
 五类职责顺序固定、不许跳步：决策 → 设计 → 评审 → 治理 → 拆任务。不下场编码、不改业务代码；
 方案不写排期与人日，任务计划不写文件名、函数名、提交顺序。零外部核心依赖：`peerDependencies` 里的 `@deepseek-ai/*` 只提供类型与运行时
@@ -33,7 +33,7 @@ dsh plugin --profile <p> add link:$PWD
 ### 装完核对组合树
 
 ```bash
-dsh --profile <p> --dump-config | grep -E "cto-domain|cto-assets|preset-cto"
+dsh --profile <p> --dump-config | grep -E "agent-preset-registry|cto-assets|preset-cto"
 ```
 
 应能看到 preset `cto` 的首项 `cto-assets`（`dsh-agent-cto/assets`，同时注册 persona 与
@@ -54,8 +54,12 @@ Skill）与 `agent-preset-registry.default: cto`。宿主层不再有 `cto-domai
 | `cto-standards` | 技术规范、编码规范、RFC、团队工程约定 | RFC / 规范：规则、检查、例外、复审 |
 | `cto-harness-audit` | Harness 审查、工具链覆盖、Agent 开发环境能力评估 | Harness 报告：能力矩阵 + 缺口 |
 | `dev-task-plan` | 拆开发任务、给开发人员分工、排依赖与里程碑、协调并行开发 | 开发任务计划：任务清单、负责人、依赖 DAG、里程碑、任务级验收、集成点与风险 |
+| `maintainer` | 检查、处理、修复、回复或关闭仓库 issue | 分诊判断 + 带料交接单 |
+| `ui-design` | 新建设计、重做界面、产出设计契约或交付 design 卡 | design/ 实例：tokens / components / screens / flows |
+| `ui-prototype` | 已有设计实例与 tokens，需要出截图供人工验收或视觉回归 | 三视口 × 状态矩阵效果图 |
+| `ui-handoff` | 提交 design 卡、拆 dev 卡或验收 dev 实现 | 交接契约：design_ref、屏与状态清单、验收口径 |
 
-十个技能的 `description` 与 `whenToUse` **路由互斥**：任一技能的描述里不得出现其它技能名
+十五个技能的 `description` 与 `whenToUse` **路由互斥**：任一技能的描述里不得出现其它技能名
 （`tests/domain.spec.ts` 机械校验，§10 L4′）。随包 `references/` 与 `assets/` 的每个文件都必须在
 对应 `SKILL.md` 正文被点名，且正文点名的路径必须真实存在（双向校验）。
 
@@ -94,7 +98,7 @@ node scripts/verify-install.mjs --assets /path/to/skills
 ├─ .npmrc                        # pnpm 安装策略
 ├─ LICENSE                       # Apache-2.0
 ├─ Makefile                      # make check / stage-dry / publish
-├─ cordis.patch.yml              # bundle patch：cto-domain + 注册表默认值 + preset-cto
+├─ cordis.patch.yml              # bundle patch：注册表默认值 + preset-cto + preset-designer
 ├─ package.json                  # dsh.bundle.patch 指向 cordis.patch.yml；files 含 skills/
 ├─ pnpm-lock.yaml
 ├─ pnpm-workspace.yaml
@@ -104,8 +108,8 @@ node scripts/verify-install.mjs --assets /path/to/skills
 ├─ src/
 │  ├─ index.ts                   # 包入口：re-export 插件三要素与领域数据
 │  ├─ plugin.ts                  # 领域工具函数（日志 / 服务探测 / Skill 注册）；宿主层不再装配
-│  ├─ assets.ts                  # preset 层插件：注册 CTO persona + 14 个 Skill
-│  ├─ domain.ts                  # CTO_DOMAIN：id / version / displayName / persona / 14 个 Skill 元数据
+│  ├─ assets.ts                  # preset 层插件：注册 CTO persona + 15 个 Skill
+│  ├─ domain.ts                  # CTO_DOMAIN：id / version / displayName / persona / 15 个 Skill 元数据
 │  ├─ persona.ts                 # CTO_PERSONA：CTO 的全部行为规则（人设唯一来源，≤ 90 行）
 │  └─ firmware.ts                # SKILL.md 读取 / frontmatter 解析 / SkillRegistration 构造
 ├─ dist-server/                  # 构建产物：pnpm build 生成，git 忽略，不手工编辑

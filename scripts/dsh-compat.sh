@@ -12,9 +12,12 @@
 # 三层判据：
 #   1. 安装准入：dsh 用包自带的 engines.dsh / peerDependencies 判定兼容性，
 #      不满足会直接拒绝安装并打印 requirements（这是 manifest 层）；
-#   2. patch 组合：`dsh --profile <p> --dump-config` 能把 dev-domain 与 3 个 preset
-#      组进配置树（这是装配层，schema 变更会在这里炸）；
-#   3. 运行时装配：冷启动 profile，断言 13 个 Skill 与 3 个 preset 真的注册成功
+#   2. patch 组合：`dsh --profile <p> --dump-config` 能把 preset 注册表
+#      （agent-preset-registry，default=cto）、两个 agent preset（preset-cto /
+#      preset-designer）与 preset 首项资产插件（cto-assets）组进配置树
+#      （这是装配层，schema 变更会在这里炸）；
+#   3. 运行时装配：冷启动 profile，断言 skills 服务契约可用、1 个 agent preset（cto）
+#      已注册且为主会话默认、preset 声明了角色资产插件
 #      （这是运行层，服务契约变更 / 模块解析失败会在这里暴露）。
 #
 # 退出码：全部目标通过为 0，任一目标失败为 1，用法错误为 2。
@@ -91,14 +94,14 @@ check_one() {
     fi
 
     local missing=0
-    for needle in "id: cto-domain" "default: cto" "id: preset-cto"; do
+    for needle in "id: agent-preset-registry" "default: cto" "id: preset-cto" "id: cto-assets"; do
       if ! grep -qF "$needle" "$work/dump.yml"; then
         err "组合结果缺少「$needle」"
         missing=1
       fi
     done
     [ "$missing" -eq 0 ] || exit 1
-    echo "[dsh-compat] PASS patch 组合（cto-domain + preset）"
+    echo "[dsh-compat] PASS patch 组合（agent-preset-registry + preset-cto + cto-assets）"
 
     # 3) 运行时：探针必须从 dsh 安装目录运行，裸导入 @deepseek-ai/dsh 才能解析
     cp "$ROOT/scripts/compat-probe.mjs" "$work/probe.mjs"
@@ -110,7 +113,7 @@ check_one() {
       err "运行时探针未通过（dsh $resolved）"
       exit 1
     fi
-    echo "[dsh-compat] PASS 运行时装配（10 Skill + 1 preset）"
+    echo "[dsh-compat] PASS 运行时装配（skills 契约 + 1 preset + 默认值 + assets 声明）"
   )
 
   local status=$?
